@@ -126,7 +126,6 @@ class CourierController extends Controller
      */
     protected function handleException(\Exception $e)
     {
-        // Log error, etc. here if you want
 
         return response()->json([
             'status' => 'error',
