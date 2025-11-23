@@ -29,12 +29,12 @@
 
                     <div class="d-flex justify-content-between small mb-2">
                         <span class="text-muted">Name:</span>
-                        <span class="fw-semibold">{{ $order->name }}</span>
+                        <span class="fw-semibold" id="orderName">{{ $order->name }}</span>
                     </div>
 
                     <div class="d-flex justify-content-between small mb-2">
                         <span class="text-muted">Mobile:</span>
-                        <span class="fw-semibold">{{ $order->mobile }}</span>
+                        <span class="fw-semibold" id="orderPhone">{{ $order->mobile }}</span>
                     </div>
 
                     <div class="d-flex justify-content-between small mb-2">
@@ -43,7 +43,7 @@
                     </div>
 
                     <div class="small text-muted mt-3">Address</div>
-                    <div class="fw-semibold">{{ $order->address }}</div>
+                    <div class="fw-semibold" id="orderAddress">{{ $order->address }}</div>
                 </div>
             </div>
         </div>
@@ -78,26 +78,24 @@
 
                     <div class="d-flex justify-content-between mb-2 small">
                         <span class="text-muted">Payment Status:</span>
-                        <span class="badge 
+                        <span class="badge
                             @if($order->payment_status == 'paid') bg-success
                             @elseif($order->payment_status == 'unpaid') bg-secondary
                             @elseif($order->payment_status == 'refunded') bg-warning text-dark
-                            @endif"
-                        >
+                            @endif">
                             {{ ucfirst($order->payment_status) }}
                         </span>
                     </div>
 
                     <div class="d-flex justify-content-between small">
                         <span class="text-muted">Order Status:</span>
-                        <span class="badge 
+                        <span class="badge
                             @if($order->status == 'pending') bg-warning text-dark
                             @elseif($order->status == 'processing') bg-primary
                             @elseif($order->status == 'shipped') bg-info text-dark
                             @elseif($order->status == 'delivered') bg-success
                             @elseif($order->status == 'cancelled') bg-danger
-                            @endif"
-                        >
+                            @endif">
                             {{ ucfirst($order->status) }}
                         </span>
                     </div>
@@ -122,13 +120,12 @@
                     <div class="fw-semibold">{{ $order->courier_tracking_id ?? '-' }}</div>
 
                     <div class="small text-muted mt-3 mb-1">Courier Status</div>
-                    <span class="badge 
+                    <span class="badge
                         @if($order->courier_status == 'pending') bg-warning text-dark
                         @elseif($order->courier_status == 'shipped') bg-info text-dark
                         @elseif($order->courier_status == 'delivered') bg-success
                         @elseif($order->courier_status == 'cancelled') bg-danger
-                        @endif"
-                    >
+                        @endif">
                         {{ ucfirst($order->courier_status) }}
                     </span>
 
@@ -136,11 +133,12 @@
 
                     <!-- Action Buttons -->
                     <div class="d-flex flex-wrap gap-2">
-                
-                          
-                            <button class="btn btn-primary btn-sm"><i class="bi bi-send me-1"></i> Send to Pathao</button>
-                 
 
+
+                        <button type="button"  data-bs-toggle="modal"
+                        data-bs-target="#pathaoOrderModal" class="btn btn-primary btn-sm"><i class="bi bi-send me-1"></i> Send to Pathao</button>
+
+                       
                         <button class="btn btn-dark btn-sm">
                             <i class="bi bi-send-check me-1"></i> Send to RedX
                         </button>
@@ -202,9 +200,9 @@
                     <label class="form-label">Order Status</label>
                     <select name="status" class="form-select">
                         @foreach(['pending','processing','shipped','delivered','cancelled'] as $s)
-                            <option value="{{ $s }}" {{ $order->status == $s ? 'selected' : '' }}>
-                                {{ ucfirst($s) }}
-                            </option>
+                        <option value="{{ $s }}" {{ $order->status == $s ? 'selected' : '' }}>
+                            {{ ucfirst($s) }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -213,9 +211,9 @@
                     <label class="form-label">Payment Status</label>
                     <select name="payment_status" class="form-select">
                         @foreach(['unpaid','paid','refunded'] as $s)
-                            <option value="{{ $s }}" {{ $order->payment_status == $s ? 'selected' : '' }}>
-                                {{ ucfirst($s) }}
-                            </option>
+                        <option value="{{ $s }}" {{ $order->payment_status == $s ? 'selected' : '' }}>
+                            {{ ucfirst($s) }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -224,9 +222,9 @@
                     <label class="form-label">Courier Status</label>
                     <select name="courier_status" class="form-select">
                         @foreach(['pending','shipped','delivered','cancelled'] as $s)
-                            <option value="{{ $s }}" {{ $order->courier_status == $s ? 'selected' : '' }}>
-                                {{ ucfirst($s) }}
-                            </option>
+                        <option value="{{ $s }}" {{ $order->courier_status == $s ? 'selected' : '' }}>
+                            {{ ucfirst($s) }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -245,7 +243,7 @@
             </form>
         </div>
     </div>
-
+    @include('partials.pathao-modal')
 </div>
 
 <style>
@@ -253,9 +251,12 @@
         letter-spacing: 0.4px;
         font-size: 0.95rem;
     }
-    .table td, .table th {
+
+    .table td,
+    .table th {
         font-size: 0.9rem;
     }
 </style>
+
 
 @endsection
