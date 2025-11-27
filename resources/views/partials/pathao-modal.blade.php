@@ -9,7 +9,7 @@ $storeId = env('PATHAO_STORE_ID'); // Your actual store ID
         <form id="pathaoOrderForm" method="POST" action="{{ url('admin/delivery/pathao/orders') }}">
             @csrf
             <input type="hidden" name="courier_id" value="{{ $pathaoCourierId }}">
-
+            <input type="hidden" name="order_id" id="modalOrderId">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="pathaoOrderModalLabel">Create Pathao Order</h5>
@@ -122,7 +122,9 @@ $storeId = env('PATHAO_STORE_ID'); // Your actual store ID
     const citySelect = document.getElementById('city_id');
     const zoneSelect = document.getElementById('zone_id');
     const areaSelect = document.getElementById('area_id');
-
+    const modalOrderId = document.getElementById('modalOrderId');
+    const order_id = document.getElementById('order_id');
+    modalOrderId.value = order_id.value;
     // Elements for pre-fill recipient info from page
     const orderPhone = document.getElementById('orderPhone')?.textContent || '';
     const orderName = document.getElementById('orderName')?.textContent || '';

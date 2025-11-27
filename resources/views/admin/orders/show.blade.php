@@ -26,7 +26,7 @@
 
                     <div class="small text-muted mb-1">Order Number</div>
                     <div class="fw-bold text-primary fs-6 mb-3">{{ $order->order_number }}</div>
-
+                    <input type="hidden" id="order_id" value="{{ $order->id }}">
                     <div class="d-flex justify-content-between small mb-2">
                         <span class="text-muted">Name:</span>
                         <span class="fw-semibold" id="orderName">{{ $order->name }}</span>
@@ -133,12 +133,12 @@
 
                     <!-- Action Buttons -->
                     <div class="d-flex flex-wrap gap-2">
-
+@if($order->courier_tracking_id==null)
 
                         <button type="button"  data-bs-toggle="modal"
                         data-bs-target="#pathaoOrderModal" class="btn btn-primary btn-sm"><i class="bi bi-send me-1"></i> Send to Pathao</button>
+@endif
 
-                       
                         <button class="btn btn-dark btn-sm">
                             <i class="bi bi-send-check me-1"></i> Send to RedX
                         </button>

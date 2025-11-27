@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Http\Request;
 use App\Services\Courier\CourierFactory;
 use Illuminate\Validation\ValidationException;
+use stdClass;
 
 class CourierController extends Controller
 {
@@ -80,17 +82,29 @@ class CourierController extends Controller
 
             $validatedData = $this->validateOrderData($request);
             $orderResponse = $courier->createOrder($validatedData);
-            dd($request->all(), $orderResponse);
+            if(isset($orderResponse['code']) && $orderResponse['code'] != 200){
+                throw new Exception($orderResponse['message'] ??"Something went wrong", 500);
+            }
+            $resp = new stdClass();
 
-            return response()->json([
-                'status' => 'success',
-                'data' => $orderResponse,
-            ], 201);
+            $resp->consignment_id     = $orderResponse["data"]['consignment_id'];
+            $resp->provider           = $courierSlug;
+            $resp->request_payload    = $validatedData;
+            $resp->response_payload   = $orderResponse["data"];
+            $resp->merchant_order_id  = $orderResponse['data']['consignment_id'];
+
+            // Better value for order_status (consignment_id is not a status!)
+            $resp->order_status       = $orderResponse['data']['status']
+                ?? $orderResponse['data']['order_status']
+                ?? 'created'; // or 'pending', 'booked', etc.
+
+            // Optional: make it clean and safe
+            $resp->consignment_id ??= null; // in case key doesn't exist
+            $this->createOrderStore($request, $resp);
+
+            return back()->with('success', 'Order created successfully!');
         } catch (ValidationException $ve) {
-            return response()->json([
-                'status' => 'fail',
-                'errors' => $ve->errors(),
-            ], 422);
+            return back()->withErrors($ve->errors())->withInput();
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -135,41 +149,27 @@ class CourierController extends Controller
 
 
 
-    public function createOrderStore(Request $request, string $courier)
+    public function createOrderStore(Request $request, $response)
     {
-        // step 1: call service
-        $service = CourierFactory::make($courier);
-        $response = $service->createOrder($request->all());
+        try{
 
-        // step 2: save response
-        $saved = CourierOrder::create([
-            'provider'           => $courier,
-            'provider_order_id'  => $response['order_id'] ?? null,
-            'merchant_order_id'  => $request->merchant_order_id,
+            $order=\DB::table('orders')->where('id', $request->order_id)->update([
+                'courier_name'=>$response->provider,
+                'courier_tracking_id'=>$response->consignment_id
+            ]);
 
-            'recipient_name'     => $request->recipient_name,
-            'recipient_phone'    => $request->recipient_phone,
-            'recipient_address'  => $request->recipient_address,
-
-            'city_id'            => $request->city_id,
-            'zone_id'            => $request->zone_id,
-            'area_id'            => $request->area_id,
-
-            'item_quantity'      => $request->item_quantity,
-            'item_weight'        => $request->item_weight,
-            'item_type'          => $request->item_type,
-            'delivery_type'      => $request->delivery_type,
-            'amount_to_collect'  => $request->amount_to_collect,
-            'item_description'   => $request->item_description,
-
-            'status'             => 'created',
-            'provider_response'  => $response,
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Order created and saved successfully!',
-            'data' => $saved
-        ]);
+            $saved = \DB::table('courier_orders')->insert([
+                'courier'           => $response->provider,
+                'order_id'  => $request->order_id,
+                'consignment_id'  => $response->consignment_id,
+                'status'             => $response->order_status,
+                'request_payload'             => json_encode($response->request_payload),
+                'response_payload'             => json_encode($response->response_payload),
+                'sent_at'  => now(),
+            ]);
+            return $saved;
+        }catch (\Exception $e){
+            throw $e;
+        }
     }
 }
