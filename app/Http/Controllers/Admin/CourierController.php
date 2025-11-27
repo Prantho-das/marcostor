@@ -173,3 +173,20 @@ class CourierController extends Controller
         }
     }
 }
+// for testing
+// PATHAO_CLIENT_ID=pmbk7XEbzJ
+// PATHAO_CLIENT_SECRET=CPExGvdwHKEQi8RHDzSIJPgt5HUvObns3qHMjlPC
+// PATHAO_USERNAME=pulakbala1082@gmail.com
+// PATHAO_PASSWORD=@Gmail.com1082&
+// PATHAO_BASE_URL=https://merchant.pathao.com/api
+// PATHAO_ENV=live
+// PATHAO_STORE_ID=347940
+
+// live server
+// PATHAO_CLIENT_ID=7N1aMJQbWm
+// PATHAO_CLIENT_SECRET=wRcaibZkUdSNz2EI9ZyuXLlNrnAv0TdPUPXMnD39
+// PATHAO_USERNAME=test@pathao.com
+// PATHAO_PASSWORD=lovePathao
+// PATHAO_BASE_URL=https://courier-api-sandbox.pathao.com
+// PATHAO_ENV=live
+// PATHAO_STORE_ID=149046
